@@ -7,19 +7,23 @@ pragma solidity ^0.8.23;
 
 import {PriceConverter} from "./PriceConverter.sol";
 
+error NotOwner();
+
 contract FundMe {
     using PriceConverter for uint256;
-    uint256 public minimumUsd = 5e18; // 5 000 000 000 000 000 000
+    uint256 public constant MINIMUM_USD = 5e18; // 5 000 000 000 000 000 000
 
-    address public owner;
+    address public immutable i_owner;
 
     // Called in the same tx that deploys the contract
     constructor() {
-        owner = msg.sender;
+        i_owner = msg.sender;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Sender is not ownwer");
+        if (msg.sender != i_owner) {
+            revert NotOwner();
+        }
         _;
     }
 
@@ -31,7 +35,7 @@ contract FundMe {
         // Have a minimum $ send
         // 1) How to send ETH to this contract?
         require(
-            msg.value.getEthAmountInUsd() >= minimumUsd,
+            msg.value.getEthAmountInUsd() >= MINIMUM_USD,
             "didn't send enough ETH"
         ); // 1e18 Wei = 1 ETH = 1 000 000 000 000 000 000 (18 zeros)
         // What is a revert?
