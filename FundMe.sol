@@ -11,6 +11,13 @@ contract FundMe {
     using PriceConverter for uint256;
     uint256 public minimumUsd = 5e18; // 5 000 000 000 000 000 000
 
+    address public owner;
+
+    // Called in the same tx that deploys the contract
+    constructor() {
+        owner = msg.sender; 
+    }
+
     address[] public funders;
     mapping(address => uint256) public addressToAmountFunded;
 
@@ -30,6 +37,7 @@ contract FundMe {
     }
 
     function withdraw() public {
+        require(msg.sender == owner, "Must be ownwer");
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
