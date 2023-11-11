@@ -10,6 +10,9 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/Ag
 contract FundMe {
     uint256 public minimumUsd = 5e18; // 5 000 000 000 000 000 000
 
+    address[] public funders;
+    mapping(address funder => uint256 amountFunded) public addressToAmountFunded;
+
     function fund() public payable {
         // Allow to send $
         // Have a minimum $ send
@@ -18,7 +21,8 @@ contract FundMe {
         // What is a revert?
         // Undo any actions that have been done, and send the remaing gas back
 
-        //... a ton of computation
+        funders.push(msg.sender);
+        addressToAmountFunded[msg.sender] += msg.value;
     }
 
     function getCurrentEthPriceInUsd() public view returns (uint256 currentEthPriceInUsd) {
