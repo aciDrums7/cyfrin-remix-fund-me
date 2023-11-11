@@ -72,4 +72,14 @@ contract FundMe {
         ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Send failed");
     }
+
+    // What happens if someone sends this contract ETH without calling the fund() function?
+
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+    }
 }
