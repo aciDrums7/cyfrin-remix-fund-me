@@ -30,9 +30,27 @@ contract FundMe {
     }
 
     function withdraw() public {
-        for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++) {
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < funders.length;
+            funderIndex++
+        ) {
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0;
         }
+        // reset the array
+        funders = new address[](0);
+
+        // withdraw all the funds (https://solidity-by-example.org/sending-ether/):
+        // transfer (2300 gas, throws error)
+        // payable(msg.sender).transfer(address(this).balance);
+
+        // send (2300 gas, returns bool)
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // require(sendSuccess, "Send failed");
+
+        // call (forward all gas or set gas, returns bool)
+        (bool callSuccess, /* bytes memory dataReturned */ ) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Send failed");
     }
 }
