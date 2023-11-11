@@ -15,7 +15,12 @@ contract FundMe {
 
     // Called in the same tx that deploys the contract
     constructor() {
-        owner = msg.sender; 
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Sender is not ownwer");
+        _;
     }
 
     address[] public funders;
@@ -36,8 +41,7 @@ contract FundMe {
         addressToAmountFunded[msg.sender] += msg.value;
     }
 
-    function withdraw() public {
-        require(msg.sender == owner, "Must be ownwer");
+    function withdraw() public onlyOwner {
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
@@ -58,7 +62,10 @@ contract FundMe {
         // require(sendSuccess, "Send failed");
 
         // call (forward all gas or set gas, returns bool)
-        (bool callSuccess, /* bytes memory dataReturned */ ) = payable(msg.sender).call{value: address(this).balance}("");
+        (
+            bool callSuccess, /* bytes memory dataReturned */
+
+        ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Send failed");
     }
 }
